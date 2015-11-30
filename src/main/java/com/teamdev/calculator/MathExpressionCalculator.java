@@ -1,13 +1,15 @@
 package com.teamdev.calculator;
 
 import com.teamdev.fsm.AbstractFiniteStateMachine;
+import com.teamdev.fsm.StateAcceptor;
 
 public class MathExpressionCalculator extends AbstractFiniteStateMachine<
         CalculationContext, CalculationState,
-        ExpressionParser, CalculationMatrix, CalculationError, Double>
+        StateAcceptor<CalculationContext>, ParserFactory,
+        CalculationMatrix, CalculationError, Double>
         implements Calculator {
 
-    final private ExpressionParser parser = new ExpressionParser();
+    final private ParserFactory parserFactory = new ParserFactory();
     final private CalculationMatrix matrix = new CalculationMatrix();
 
     @Override
@@ -26,13 +28,18 @@ public class MathExpressionCalculator extends AbstractFiniteStateMachine<
     }
 
     @Override
-    protected ExpressionParser getStateAcceptor() {
-        return parser;
+    protected ParserFactory getStateAcceptorFactory() {
+        return parserFactory;
     }
 
     @Override
     protected CalculationMatrix getTransitionMatrix() {
         return matrix;
+    }
+
+    @Override
+    protected void acceptStep(CalculationContext context) {
+
     }
 
     public static void main(String[] args) throws Exception {

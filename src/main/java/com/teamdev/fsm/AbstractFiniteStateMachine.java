@@ -6,7 +6,8 @@ import java.util.Set;
 public abstract class AbstractFiniteStateMachine<
         Context extends FiniteStateMachineContext,
         State extends Enum,
-        Acceptor extends StateAcceptor<State, Context>,
+        Acceptor extends StateAcceptor<Context>,
+        AcceptorFactory extends StateAcceptorFactory<Context, State, Acceptor>,
         Matrix extends TransitionMatrix<State>,
         Error extends Exception,
         Result>
@@ -28,6 +29,7 @@ public abstract class AbstractFiniteStateMachine<
                 deadlock(context);
                 break;
             }
+            acceptStep(context);
         }
 
         return prepareResult(context);
@@ -39,7 +41,7 @@ public abstract class AbstractFiniteStateMachine<
                 getPossibleTransitions(currentState);
 
         for (State state : possibleTransitions) {
-            if (getStateAcceptor().accept(state, context)) {
+            if(getStateAcceptorFactory().getAcceptor(state).accept(context)){
                 return state;
             }
         }
@@ -47,11 +49,13 @@ public abstract class AbstractFiniteStateMachine<
         return null;
     }
 
+    protected abstract void acceptStep(Context context);
+
     protected abstract Result prepareResult(Context context);
 
     protected abstract void deadlock(Context context) throws Error;
 
-    protected abstract Acceptor getStateAcceptor();
+    protected abstract AcceptorFactory getStateAcceptorFactory();
 
     protected abstract Matrix getTransitionMatrix();
 }
